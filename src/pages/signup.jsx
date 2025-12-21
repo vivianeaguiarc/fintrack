@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Link } from 'react-router'
 
 import PasswordInput from '@/components/password-input'
@@ -10,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 
 const Signup = () => {
@@ -28,6 +30,21 @@ const Signup = () => {
           <Input placeholder="Digite seu email" />
           <PasswordInput />
           <PasswordInput placeholder="Digite sua senha novamente" />
+          <div className="items-top flex space-x-2">
+            <Checkbox id="terms" />
+            <div className="grid gap-1.5 leading-none">
+              <label
+                htmlFor="terms"
+                className="text-xs text-muted-foreground opacity-70"
+              >
+                Ao clicar em "Criar Conta", você concorda com nossos{' '}
+                <a href="#" className="text-white underline">
+                  termos de uso e política de privacidade.
+                </a>
+              </label>
+              <p className="text-sm text-muted-foreground"></p>
+            </div>
+          </div>
         </CardContent>
         <CardFooter>
           <Button className="w-full">Criar Conta</Button>
