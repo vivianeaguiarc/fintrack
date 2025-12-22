@@ -1,7 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import PasswordInput from '@/components/password-input'
@@ -24,6 +27,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { api } from '@/lib/axios'
 
 const signupSchema = z.object({
   firstName: z.string().trim().min(2, {
@@ -47,6 +51,21 @@ const signupSchema = z.object({
 })
 
 const Signup = () => {
+  const [user, setUser] = useState(null)
+
+  const signupMutation = useMutation({
+    mutationKey: ['signup'],
+    mutationFn: async (data) => {
+      const response = await api.post('/users', {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        password: data.password,
+      })
+      return response.data
+    },
+  })
+
   const methods = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -59,8 +78,29 @@ const Signup = () => {
     },
   })
   const handleSubmit = (data) => {
-    console.log(data)
+    signupMutation.mutate(data, {
+      onSuccess: (createdUser) => {
+        const accessToken = createdUser.tokens.accessToken
+        const refreshToken = createdUser.tokens.refreshToken
+
+        setUser(createdUser)
+
+        localStorage.setItem('accessToken', accessToken)
+        localStorage.setItem('refreshToken', refreshToken)
+
+        toast.success('Conta criada com sucesso!')
+      },
+      onError: () => {
+        toast.error(
+          'Erro ao criar a conta. Por favor, tente novamente mais tarde.'
+        )
+      },
+    })
   }
+  if (user) {
+    return <h1>Ola, {user.first_name}!</h1>
+  }
+
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center gap-3">
       <Form {...methods}>
