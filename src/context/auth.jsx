@@ -9,6 +9,7 @@ export const AuthContext = createContext({
   isInitializing: true,
   login: () => {},
   signup: () => {},
+  signOut: () => {},
 })
 
 export const useAuthContext = () => useContext(AuthContext)
@@ -44,7 +45,7 @@ export const AuthContextProvider = ({ children }) => {
   const loginMutation = useMutation({
     mutationKey: ['login'],
     mutationFn: async (data) => {
-      const response = await api.post('users/login', {
+      const response = await api.post('/users/login', {
         email: data.email,
         password: data.password,
       })
@@ -108,6 +109,10 @@ export const AuthContextProvider = ({ children }) => {
       },
     })
   }
+  const signOut = () => {
+    setUser(null)
+    removeTokens()
+  }
   return (
     <AuthContext.Provider
       value={{
@@ -115,6 +120,7 @@ export const AuthContextProvider = ({ children }) => {
         login,
         signup,
         isInitializing,
+        signOut,
       }}
     >
       {children}
