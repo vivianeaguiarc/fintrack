@@ -34,7 +34,7 @@ const loginSchema = z.object({
 })
 
 const Login = () => {
-  const { user, login } = useAuthContext()
+  const { user, login, isInitializing } = useAuthContext()
   const methods = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -44,9 +44,9 @@ const Login = () => {
   })
 
   const handleSubmit = (data) => login(data)
-
+  if (isInitializing) return null
   if (user) {
-    return <div>Bem-vindo, {user.first_name}!</div>
+    return <Navigate to="/" />
   }
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center gap-3">
