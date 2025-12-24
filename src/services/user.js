@@ -61,4 +61,20 @@ export const UserService = {
       email: response.data.email,
     }
   },
+  /**
+   *
+   * retiorna o balance do usuario
+   * @param {Object} input - Dados para buscar o balance
+   * @param {string} input.from - Data inicial
+   * @param {string} input.to - Data final
+   */
+  getBalance: async (input) => {
+    const queryParams = new URLSearchParams()
+    queryParams.set('from', input.from)
+    queryParams.set('to', input.to)
+    const response = await protectedApi.get(
+      `/users/me/balance?${queryParams.toString()}`
+    )
+    return response.data
+  },
 }
