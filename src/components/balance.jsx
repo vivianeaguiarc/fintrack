@@ -14,17 +14,15 @@ import { UserService } from '@/services/user'
 const Balance = () => {
   const [searchParams] = useSearchParams()
   const { user } = useAuthContext()
-  const { data } = useQuery({
-    queryKey: ['balance', user.id],
-    queryFn: () => {
-      const from = searchParams.get('from')
-      const to = searchParams.get('to')
+  const from = searchParams.get('from')
+  const to = searchParams.get('to')
 
+  const { data } = useQuery({
+    queryKey: ['balance', user.id, from, to],
+    queryFn: () => {
       return UserService.getBalance({ from, to })
     },
   })
-
-  console.log({ data })
 
   return (
     <div className="grid grid-cols-2 grid-rows-2 gap-6">

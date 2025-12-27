@@ -23,9 +23,7 @@ const DateSelection = () => {
       : addMonths(new Date(), 1),
   })
 
-  // 1. sempre que o state "date" mudar, eu preciso persistir na url
   useEffect(() => {
-    // early return
     if (!date?.from || !date?.to) return
 
     const queryParams = new URLSearchParams()
@@ -33,10 +31,16 @@ const DateSelection = () => {
     queryParams.set('to', formatDateToQueryParam(date.to))
 
     navigate(`/?${queryParams.toString()}`)
-    queryClient.invalidateQueries({ queryKey: ['balance', user.id] })
-  }, [navigate, date, queryClient, user.id])
 
-  // 2. quando eu recarregar a página, eu pego o from e to da url
+    queryClient.invalidateQueries({
+      queryKey: [
+        'balance',
+        user.id,
+        formatDateToQueryParam(date.from),
+        formatDateToQueryParam(date.to),
+      ],
+    })
+  }, [navigate, date, queryClient, user.id])
 
   return <DatePickerWithRange value={date} onChange={setDate} />
 }
