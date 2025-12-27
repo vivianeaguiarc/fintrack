@@ -1,8 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
 import { Link, Navigate } from 'react-router'
-import { z } from 'zod'
 
 import PasswordInput from '@/components/password-input'
 import { Button } from '@/components/ui/button'
@@ -25,51 +22,12 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useAuthContext } from '@/context/auth'
+import { useSignupForm } from '@/forms/hooks/user'
 
-const signupSchema = z
-  .object({
-    firstName: z.string().trim().min(2, {
-      message: 'O nome deve ter no mínimo 2 caracteres.',
-    }),
-    lastName: z.string().trim().min(2, {
-      message: 'O sobrenome deve ter no mínimo 2 caracteres.',
-    }),
-    email: z.string().trim().email({
-      message: 'Insira um email válido.',
-    }),
-    password: z.string().min(6, {
-      message: 'A senha deve ter no mínimo 6 caracteres.',
-    }),
-    confirmPassword: z.string().min(6, {
-      message: 'A confirmação de senha deve ter no mínimo 6 caracteres.',
-    }),
-    terms: z.boolean().refine((value) => value === true, {
-      message: 'Você deve aceitar os termos de uso e política de privacidade.',
-    }),
-  })
-  .refine(
-    (data) => {
-      return data.password === data.confirmPassword
-    },
-    {
-      message: 'As senhas não coincidem.',
-      path: ['confirmPassword'],
-    }
-  )
 const Signup = () => {
   const { user, signup, isInitializing } = useAuthContext()
 
-  const methods = useForm({
-    resolver: zodResolver(signupSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      terms: false,
-    },
-  })
+  const { form } = useSignupForm()
 
   const handleSubmit = (data) => signup(data)
   if (user) {
@@ -78,8 +36,8 @@ const Signup = () => {
   if (isInitializing) return null
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center gap-3">
-      <Form {...methods}>
-        <form onSubmit={methods.handleSubmit(handleSubmit)}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
           <Card className="w-[500px]">
             <CardHeader>
               <CardTitle>Crie a sua conta</CardTitle>
@@ -89,7 +47,7 @@ const Signup = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
-                control={methods.control}
+                control={form.control}
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
@@ -102,7 +60,7 @@ const Signup = () => {
                 )}
               />
               <FormField
-                control={methods.control}
+                control={form.control}
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
@@ -115,7 +73,7 @@ const Signup = () => {
                 )}
               />
               <FormField
-                control={methods.control}
+                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -128,7 +86,7 @@ const Signup = () => {
                 )}
               />
               <FormField
-                control={methods.control}
+                control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
@@ -141,7 +99,7 @@ const Signup = () => {
                 )}
               />
               <FormField
-                control={methods.control}
+                control={form.control}
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
@@ -154,7 +112,7 @@ const Signup = () => {
                 )}
               />
               <FormField
-                control={methods.control}
+                control={form.control}
                 name="terms"
                 render={({ field }) => (
                   <FormItem className="items-top flex space-x-2">
@@ -169,13 +127,13 @@ const Signup = () => {
                       <FormLabel
                         htmlFor="terms"
                         className={`opacity-70" text-xs text-muted-foreground ${
-                          methods.formState.errors.terms ? 'text-red-500' : ''
+                          form.formState.errors.terms ? 'text-red-500' : ''
                         }`}
                       >
                         Ao clicar em "Criar Conta", você concorda com nossos{' '}
                         <a
                           href="#"
-                          className={`text-white underline ${methods.formState.errors.terms ? 'text-red-500' : ''}`}
+                          className={`text-white underline ${form.formState.errors.terms ? 'text-red-500' : ''}`}
                         >
                           termos de uso e política de privacidade.
                         </a>
