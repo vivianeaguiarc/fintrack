@@ -51,6 +51,7 @@ const DateSelection = () => {
         formatDateToQueryParam(date.from),
         formatDateToQueryParam(date.to),
       ],
+      exact: true,
     })
   }, [navigate, date, queryClient, user.id])
 
