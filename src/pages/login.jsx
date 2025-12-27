@@ -1,8 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { Loader2Icon } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import { z } from 'zod'
 
 import PasswordInput from '@/components/password-input'
 import { Button } from '@/components/ui/button'
@@ -24,25 +22,11 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useAuthContext } from '@/context/auth'
-
-const loginSchema = z.object({
-  email: z.string().trim().email({
-    message: 'Insira um email válido.',
-  }),
-  password: z.string().min(6, {
-    message: 'A senha deve ter no mínimo 6 caracteres.',
-  }),
-})
+import { useLoginForm } from '@/forms/hooks/user'
 
 const Login = () => {
   const { user, login, isInitializing } = useAuthContext()
-  const methods = useForm({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  })
+  const { form } = useLoginForm()
 
   const handleSubmit = (data) => login(data)
   if (isInitializing) return null
@@ -51,8 +35,8 @@ const Login = () => {
   }
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center gap-3">
-      <Form {...methods}>
-        <form onSubmit={methods.handleSubmit(handleSubmit)}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
           <Card className="w-[500px]">
             <CardHeader>
               <CardTitle>Entrar</CardTitle>
@@ -63,7 +47,7 @@ const Login = () => {
 
             <CardContent className="space-y-4">
               <FormField
-                control={methods.control}
+                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -77,7 +61,7 @@ const Login = () => {
               />
 
               <FormField
-                control={methods.control}
+                control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
@@ -92,7 +76,12 @@ const Login = () => {
             </CardContent>
 
             <CardFooter className="flex flex-col gap-3">
-              <Button className="w-full">Entrar</Button>
+              <Button className="w-full" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Fazer login
+              </Button>
 
               <Button variant="link" asChild>
                 <Link to="/signup">Ainda não tem conta? Crie uma</Link>
@@ -106,5 +95,3 @@ const Login = () => {
 }
 
 export default Login
-
-// Configurando o React Query & Axios
