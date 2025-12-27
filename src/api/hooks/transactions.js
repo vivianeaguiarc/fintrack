@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useAuthContext } from '@/context/auth'
 
@@ -17,6 +17,19 @@ export const useCreateTransaction = () => {
       queryClient.invalidateQueries({
         queryKey: getUserBalanceQueryKey({ userId: user.id }),
       })
+    },
+  })
+}
+export const getTransactionsQueryKey = (userId, from, to) => {
+  if (!from || !to) return ['getTransactions', userId]
+  return ['getTransactions', userId, from, to]
+}
+export const useGetTransactions = ({ from, to }) => {
+  const { user } = useAuthContext()
+  return useQuery({
+    queryKey: getTransactionsQueryKey(user.id, from, to),
+    queryFn: () => {
+      return TransactionService.getAll({ from, to })
     },
   })
 }
