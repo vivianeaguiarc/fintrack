@@ -1,7 +1,11 @@
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { useSearchParams } from 'react-router-dom'
 
 import { useGetTransactions } from '@/api/hooks/transactions'
+import TransactionTypeBadge from '@/components/transaction-type-badge'
 import { DataTable } from '@/components/ui/data-table'
+import { formatCurrency } from '@/helpers/currency'
 
 const columns = [
   {
@@ -11,46 +15,29 @@ const columns = [
   {
     accessorKey: 'type',
     header: 'Tipo',
-    cell: ({ row }) => {
-      const typeMap = {
-        EARNING: {
-          label: 'Ganho',
-          className: 'text-green-500',
-        },
-        EXPENSE: {
-          label: 'Gasto',
-          className: 'text-red-500',
-        },
-        INVESTMENT: {
-          label: 'Investimento',
-          className: 'text-blue-500',
-        },
-      }
-
-      const type = row.original.type
-
-      return (
-        <span className={typeMap[type]?.className ?? 'text-gray-400'}>
-          {typeMap[type]?.label ?? '—'}
-        </span>
-      )
+    cell: ({ row: { original: transaction } }) => {
+      return <TransactionTypeBadge variant={transaction.type.toLowerCase()} />
     },
   },
+
   {
     accessorKey: 'date',
     header: 'Data',
-    cell: ({ row }) => new Date(row.original.date).toLocaleDateString('pt-BR'),
+    cell: ({ row }) => {
+      const date = new Date(row.original.date)
+
+      return format(date, "dd 'de' MMMM 'de' yyyy", {
+        locale: ptBR,
+      })
+    },
   },
+
   {
     accessorKey: 'amount',
     header: 'Valor',
     cell: ({ row }) => {
       const amount = Number(row.original.amount)
-
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(amount)
+      return formatCurrency(amount)
     },
   },
   {
