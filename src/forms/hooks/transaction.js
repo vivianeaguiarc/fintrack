@@ -1,9 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
-import { useCreateTransaction } from '@/api/hooks/transactions'
+import {
+  useCreateTransaction,
+  useEditTransaction,
+} from '@/api/hooks/transactions'
 
-import { createTransactionFormSchema } from '../schemas/transaction'
+import {
+  createTransactionFormSchema,
+  editTransactionFormSchema,
+} from '../schemas/transaction'
 
 export const useCreateTransactionForm = ({ onSuccess, onError }) => {
   const { mutateAsync: createTransaction } = useCreateTransaction()
@@ -20,6 +26,30 @@ export const useCreateTransactionForm = ({ onSuccess, onError }) => {
   const onSubmit = async (data) => {
     try {
       await createTransaction(data)
+      onSuccess()
+    } catch (error) {
+      console.error('Erro ao criar transação:', error)
+      onError(error)
+    }
+  }
+  return { form, onSubmit }
+}
+export const useEditTransactionForm = ({ transaction, onSuccess, onError }) => {
+  const { mutateAsync: updateTransaction } = useEditTransaction()
+  const form = useForm({
+    resolver: zodResolver(editTransactionFormSchema),
+    defaultValues: {
+      id: transaction?.id || '',
+      name: transaction?.name || '',
+      amount: parseFloat(transaction?.amount) || 0,
+      date: transaction?.date ? new Date(transaction.date) : new Date(),
+      type: transaction?.type || 'EARNING',
+    },
+    shouldUnregister: true,
+  })
+  const onSubmit = async (data) => {
+    await updateTransaction(data)
+    try {
       onSuccess()
     } catch (error) {
       console.error('Erro ao criar transação:', error)
