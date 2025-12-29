@@ -9,6 +9,7 @@ import { DataTable } from '@/components/ui/data-table'
 import { formatCurrency } from '@/helpers/currency'
 
 import { Button } from './ui/button'
+import { ScrollArea } from './ui/scroll-area'
 
 const columns = [
   {
@@ -80,7 +81,14 @@ const TransactionsTable = () => {
     )
   }
 
-  return <DataTable columns={columns} data={transactions} />
+  return (
+    <>
+      <h2 className="text-2xl font-bold">Transações</h2>
+      <ScrollArea className="h-[400px] max-h-[400px] rounded-md border">
+        <DataTable columns={columns} data={transactions} />
+      </ScrollArea>
+    </>
+  )
 }
 
 export default TransactionsTable
