@@ -1,3 +1,4 @@
+import { ExternalLinkIcon } from 'lucide-react'
 import {
   Loader2Icon,
   PiggyBankIcon,
@@ -8,19 +9,17 @@ import { useState } from 'react'
 import { NumericFormat } from 'react-number-format'
 import { toast } from 'sonner'
 
-import { DialogDescription } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { useCreateTransactionForm } from '@/forms/hooks/transaction'
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
+import { useEditTransactionForm } from '@/forms/hooks/transaction'
 
-import { Button } from './ui/button'
 import { DatePicker } from './ui/date-picker'
 import {
   Form,
@@ -32,28 +31,31 @@ import {
 } from './ui/form'
 import { Input } from './ui/input'
 
-const AddTransactionButton = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const { form, onSubmit } = useCreateTransactionForm({
+const EditTransactionButton = ({ transaction }) => {
+  const [sheetIsOpen, setSheetIsOpen] = useState(false)
+  const { form, onSubmit } = useEditTransactionForm({
+    transaction,
     onSuccess: () => {
-      setIsDialogOpen(false)
+      setSheetIsOpen(false)
+      toast.success('Transação atualizada com sucesso.')
     },
     onError: () => {
-      toast.error('Erro ao criar transação. Tente novamente.')
+      toast.error('Erro ao atualizar transação. Tente novamente.')
     },
   })
+  console.log('TRANSACTION RECEBIDA NO EDIT', transaction)
 
   return (
     <>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          <Button>Nova Transação</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Nova Transação</DialogTitle>
-            <DialogDescription>Insira as informações abaixo</DialogDescription>
-          </DialogHeader>
+      <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <ExternalLinkIcon className="text-muted-foreground" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent className="min-w-[450px]">
+          <SheetTitle>Editar transação</SheetTitle>
+          {transaction?.name}
           <Form {...form}>
             <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
@@ -159,8 +161,8 @@ const AddTransactionButton = () => {
                   </FormItem>
                 )}
               />
-              <DialogFooter className="sm:space-x-4">
-                <DialogClose asChild>
+              <SheetFooter className="sm:space-x-4">
+                <SheetClose asChild>
                   <Button
                     type="reset"
                     variant="secondary"
@@ -169,7 +171,7 @@ const AddTransactionButton = () => {
                   >
                     Cancelar
                   </Button>
-                </DialogClose>
+                </SheetClose>
                 <Button
                   type="submit"
                   className="w-full"
@@ -178,15 +180,15 @@ const AddTransactionButton = () => {
                   {form.formState.isSubmitting && (
                     <Loader2Icon className="animate-spin" />
                   )}
-                  Adicionar
+                  Salvar
                 </Button>
-              </DialogFooter>
+              </SheetFooter>
             </form>
           </Form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </>
   )
 }
 
-export default AddTransactionButton
+export default EditTransactionButton
